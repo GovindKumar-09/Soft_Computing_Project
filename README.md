@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AI-Powered Lecture Review Platform
 
 Speech Recognition and Retrieval-Augmented Generation for Time-Stamped Study Assistance.
@@ -73,3 +74,7 @@ SOFT_COMPUTING_PROJECT\VIDEO_SUMMARIZER_BACKEND\APP
 └───utils
         prompts.py
         __init__.py
+=======
+# AI-Learning-Assistant
+AI Learning Assistance 
+>>>>>>> origin/my_frontend

@@ -1,27 +1,42 @@
-import Upload from './components/Upload';
-import Chat from './components/Chat';
+
+import { Routes, Route, Navigate } from 'react-router-dom'
+
+import Layout from './components/layout/Layout'
+
+import Landing from './pages/Landing'
+import Dashboard from './pages/Dashboard'
+import UploadLecture from './pages/UploadLecture'
+import Transcript from './pages/Transcript'
+import Notes from './pages/Notes'
+import Quiz from './pages/Quiz'
+import Chat from './pages/Chat'
+import Login from './pages/Login'
+import Register from './pages/Register'
 
 function App() {
   return (
-    <div className="container mx-auto p-4 max-w-5xl">
-      <h1 className="text-3xl font-bold text-center mb-8 mt-4">
-        AI Lecture Review Platform
-      </h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left Side: Upload Component */}
-        <div>
-          <Upload />
-        </div>
+    <Routes>
+      {/* Pages with the main navigation */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<Landing />} />
+        <Route path="/lectures" element={<Dashboard />} />
+        <Route path="/upload" element={<UploadLecture />} />
 
-        {/* Right Side: Chat Component */}
-        <div>
-          {/* Abhi testing ke liye ek dummy videoId pass kar rahe hain */}
-          <Chat videoId="test-video-id" />
-        </div>
-      </div>
-    </div>
-  );
+        <Route path="/transcript" element={<Transcript />} />
+        <Route path="/transcript/:id" element={<Transcript />} />
+
+        <Route path="/notes" element={<Notes />} />
+        <Route path="/quiz" element={<Quiz />} />
+        <Route path="/chat" element={<Chat />} />
+      </Route>
+
+      {/* Authentication pages without the main navbar */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  )
 }
 
-export default App;
+export default App

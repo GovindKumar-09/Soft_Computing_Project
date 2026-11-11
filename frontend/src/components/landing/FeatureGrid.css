@@ -1,0 +1,110 @@
+
+/* =========================================
+   NEON FEATURE CARD
+========================================= */
+
+.neon-card {
+  isolation: isolate;
+  position: relative;
+  overflow: hidden;
+
+  padding: 1.5px;
+
+  background: rgba(139, 92, 246, 0.28);
+
+  box-shadow:
+    0 0 15px rgba(139, 92, 246, 0.08),
+    0 0 30px rgba(139, 92, 246, 0.04);
+
+  transition:
+    box-shadow 350ms ease,
+    background-color 350ms ease;
+}
+
+/* Travelling neon beam */
+
+.neon-card::before {
+  content: '';
+
+  position: absolute;
+  inset: -60%;
+
+  z-index: 0;
+  pointer-events: none;
+
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 265deg,
+    rgba(139, 92, 246, 0.2) 282deg,
+    #8b5cf6 294deg,
+    #c4b5fd 300deg,
+    #22d3ee 307deg,
+    transparent 325deg 360deg
+  );
+
+  filter: blur(2px);
+
+  opacity: 0.85;
+
+  animation: neon-edge-orbit 5.5s linear infinite;
+  animation-delay: var(--neon-delay, 0s);
+
+  transition:
+    opacity 300ms ease,
+    filter 300ms ease;
+}
+
+/* Inner card surface */
+
+.neon-card__surface {
+  position: absolute;
+  inset: 1.5px;
+
+  z-index: 1;
+
+  border-radius: 22.5px;
+
+  background-color: #100d1b;
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  pointer-events: none;
+}
+
+/* Hover enhancement */
+
+.neon-card:hover {
+  box-shadow:
+    0 0 18px rgba(139, 92, 246, 0.22),
+    0 0 35px rgba(139, 92, 246, 0.16),
+    0 0 55px rgba(34, 211, 238, 0.08);
+}
+
+.neon-card:hover::before {
+  opacity: 1;
+  filter: blur(1px);
+}
+
+/* Moving beam animation */
+
+@keyframes neon-edge-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Accessibility: respect reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .neon-card::before {
+    animation: none;
+  }
+
+  .neon-card {
+    transition: none;
+  }
+}
