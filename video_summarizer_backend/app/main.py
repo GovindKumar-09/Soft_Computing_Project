@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.api.routes.manual_transcript import router as manual_transcript_router
 from app.api.routes.transcript import router as transcript_router
 '''from app.api.routes.ingest import router as ingest_router
 from app.api.routes.summary import router as summary_router
@@ -17,7 +18,11 @@ app.include_router(transcript_router, prefix="/api", tags=["Transcript"])
 app.include_router(summary_router, prefix="/api", tags=["Summarization"])
 app.include_router(quiz_router, prefix="/api", tags=["Quiz"])
 app.include_router(chat_router, prefix="/api", tags=["RAG Chat"])'''
-
+app.include_router(
+    manual_transcript_router,
+    prefix="/api",
+    tags=["Manual Transcript"]
+)
 
 @app.get("/")
 def home():

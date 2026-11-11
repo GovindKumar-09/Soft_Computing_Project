@@ -7,7 +7,6 @@ from app.services.text_splitter import split_transcript
 from app.services.vector_store import create_vector_store
 
 
-VIDEO_URL = "https://www.youtube.com/watch?v=ixq5cpdEO2Q"
 
 
 def ingest_video(video_url):
@@ -40,6 +39,3 @@ def ingest_video(video_url):
     print("Video successfully stored in Pinecone!")
 
 
-if __name__ == "__main__":
-
-    ingest_video(VIDEO_URL)

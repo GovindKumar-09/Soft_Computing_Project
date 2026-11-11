@@ -7,3 +7,7 @@ class TranscriptResponse(BaseModel):
     success: bool
     video_id: str
     transcript: str
+
+class ManualTranscriptRequest(BaseModel):
+    video_url: HttpUrl
+    transcript: str

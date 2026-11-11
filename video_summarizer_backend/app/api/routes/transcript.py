@@ -34,7 +34,7 @@ def fetch_transcript(request: TranscriptRequest):
         video_id = str(ULID())
 
         # Store transcript in MongoDB
-        save_transcript(video_id, transcript)
+        #save_transcript(video_id, transcript)
 
         return TranscriptResponse(
             success=True,
