@@ -3,28 +3,15 @@ import json
 import re
 from datetime import datetime, timezone
 
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.prompts import ChatPromptTemplate
 
-from app.services.llm import get_llm
-from app import core
+from app.core.database import get_summary_collection
+from app.services.chains import create_text_chain
 
 
 def get_collection():
-    """Support both the original and updated database.py."""
-
-    from app.core import database
-
-    getter = getattr(database, "get_summary_collection", None)
-
-    if callable(getter):
-        return getter()
-
-    collection = getattr(database, "summary_collection", None)
-
-    if collection is None:
-        raise RuntimeError("MongoDB summary collection is unavailable.")
-
-    return collection
+    return get_summary_collection()
 
 
 def extract_response_text(content):
@@ -143,8 +130,6 @@ def generate_summary(
     if not transcript or not transcript.strip():
         raise ValueError("Transcript cannot be empty.")
 
-    llm = get_llm()
-
     system_prompt = """
 You are an expert university lecture summarizer and study-note creator.
 
@@ -224,14 +209,12 @@ TRANSCRIPT:
 {transcript}
 """
 
-    messages = [
+    summary_prompt = ChatPromptTemplate.from_messages([
         SystemMessage(content=system_prompt),
-        HumanMessage(content=human_prompt)
-    ]
-
-    response = llm.invoke(messages)
-
-    raw_data = parse_summary_json(response.content)
+        HumanMessage(content=human_prompt),
+    ])
+    summary_chain = create_text_chain(summary_prompt)
+    raw_data = parse_summary_json(summary_chain.invoke({}))
 
     structured_summary = normalize_summary(raw_data)
 

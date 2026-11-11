@@ -1,6 +1,6 @@
 from app.services.vector_store import get_vector_store
 from app.services.retriever import create_retriever
-from app.services.llm import get_llm
+from app.services.chains import create_text_chain
 from app.utils.prompts import prompt
 
 
@@ -28,14 +28,8 @@ def chat_with_video(video_id, username, question):
     )
 
     # Step 5: Create prompt
-    final_prompt = prompt.format(
-        context=context_text,
-        question=question
-    )
-
-    # Step 6: Generate answer
-    llm = get_llm()
-
-    response = llm.invoke(final_prompt)
-
-    return response.content
+    chat_chain = create_text_chain(prompt)
+    return chat_chain.invoke({
+        "context": context_text,
+        "question": question
+    })

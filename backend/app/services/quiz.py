@@ -1,8 +1,10 @@
 
 import json
 import re
-from langchain_core.messages import SystemMessage, HumanMessage
-from app.services.llm import get_llm
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.prompts import ChatPromptTemplate
+
+from app.services.chains import create_text_chain
 
 
 def parse_quiz_json(content):
@@ -64,7 +66,6 @@ def generate_quiz(transcript: str, lecture_metadata: dict = None, num_questions:
     if not transcript or not transcript.strip():
         raise ValueError("Transcript cannot be empty.")
 
-    llm = get_llm()
     meta = lecture_metadata or {}
 
     system_prompt = """
@@ -104,13 +105,12 @@ TRANSCRIPT:
 {transcript[:32000]}
 """
 
-    messages = [
+    quiz_prompt = ChatPromptTemplate.from_messages([
         SystemMessage(content=system_prompt),
-        HumanMessage(content=human_prompt)
-    ]
-
-    response = llm.invoke(messages)
-    raw = parse_quiz_json(response.content)
+        HumanMessage(content=human_prompt),
+    ])
+    quiz_chain = create_text_chain(quiz_prompt)
+    raw = parse_quiz_json(quiz_chain.invoke({}))
     questions = normalize_quiz(raw)
 
     if not questions:

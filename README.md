@@ -29,6 +29,14 @@ The browser extracts audio from video with FFmpeg.wasm. FastAPI transcribes it w
 
 `GET /api/health` reports backend, MongoDB, Groq, Gemini, and Pinecone configuration. Cloud provider calls require valid credentials, network access, and an appropriately configured Pinecone index.
 
+## Backend modules
+
+- `backend/main.py` assembles the FastAPI app, middleware, routers, and health endpoint.
+- `backend/app/api/routes/` contains HTTP validation, authentication, and response handling.
+- `backend/app/core/` owns configuration, MongoDB connections, and authentication primitives.
+- `backend/app/services/` owns uploads, transcription, lecture processing, summaries, quizzes, embeddings, retrieval, and chat.
+- `backend/app/services/chains.py` builds LangChain Expression Language chains by composing prompt templates, the shared chat model, and `StrOutputParser`. Summary generation, quiz generation, and RAG answers all use these chains.
+
 ## Authentication
 
 Registration and login issue 12-hour HMAC-signed bearer tokens. Passwords are stored as salted PBKDF2-SHA256 hashes. By default, the browser keeps a session token until the tab session ends; “Remember me” persists it in local storage. The API derives lecture ownership from the verified account and checks ownership on lecture, transcript, quiz, video, ingestion, and chat operations. Use HTTPS in deployment and keep `JWT_SECRET` stable and private.

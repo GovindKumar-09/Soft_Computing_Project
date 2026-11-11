@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, HTTPException, Depends
 
-from app.core.database import summary_collection
+from app.core.database import get_summary_collection
 from app.core.auth import get_current_user
 
 
@@ -13,13 +13,13 @@ router = APIRouter()
 # --------------------------------------------------
 
 def get_collection():
-    if summary_collection is None:
+    try:
+        return get_summary_collection()
+    except Exception as error:
         raise HTTPException(
             status_code=503,
             detail="MongoDB summary collection is unavailable."
-        )
-
-    return summary_collection
+        ) from error
 
 
 # --------------------------------------------------

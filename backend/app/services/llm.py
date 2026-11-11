@@ -1,14 +1,12 @@
+from functools import lru_cache
+
 from langchain_groq import ChatGroq
+from app.core.config import GROQ_CHAT_MODEL
 
 
+@lru_cache(maxsize=1)
 def get_llm():
-
-    llm = ChatGroq(
-        model="openai/gpt-oss-120b",
-        temperature=0.2
-    )
-
-    return llm
+    return ChatGroq(model=GROQ_CHAT_MODEL, temperature=0.2)
 
 
 
