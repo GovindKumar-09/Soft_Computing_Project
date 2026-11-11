@@ -9,3 +9,11 @@ def get_llm():
     )
 
     return llm
+
+
+
+"""Get-ChildItem -Directory | Where-Object {
+    $_.Name -notin @("venv", "node_modules", "__pycache__")
+} | ForEach-Object {
+    tree $_.FullName /F
+}"""
