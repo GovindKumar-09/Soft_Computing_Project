@@ -1,0 +1,12 @@
+youtube-transcript-api
+langchain-community
+langchain-text-splitters
+langchain-google-genai
+langchain-groq
+langchain-pinecone
+langchain-core
+pinecone
+fastapi
+uvicorn
+python-dotenv
+tiktoken
