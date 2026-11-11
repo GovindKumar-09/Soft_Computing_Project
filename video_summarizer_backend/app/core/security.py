@@ -1,31 +1,40 @@
-import secrets
+import jwt
+import bcrypt
+from datetime import datetime, timedelta
+from fastapi import Request, HTTPException, status
 
-from fastapi import HTTPException, Security
-from fastapi.security import APIKeyHeader
+SECRET_KEY = "super_secret_jwt_key_change_in_production"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_DAYS = 7
 
-from app.core.config import CHAT_API_KEY
+def hash_password(password: str) -> str:
+    # Direct bcrypt hashing (passlib version bug avoid karne ke liye)
+    pwd_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    hashed_pwd = bcrypt.hashpw(pwd_bytes, salt)
+    return hashed_pwd.decode('utf-8')
 
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    # Verify hashed password
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
-api_key_header = APIKeyHeader(
-    name="X-API-Key",
-    auto_error=False
-)
+def create_jwt_token(user_id: str) -> str:
+    expire = datetime.utcnow() + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+    payload = {"sub": user_id, "exp": expire}
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-
-def verify_api_key(api_key: str = Security(api_key_header)):
-
-    if not CHAT_API_KEY:
+def get_current_user_id(request: Request) -> str:
+    token = request.cookies.get("access_token")
+    if not token:
         raise HTTPException(
-            status_code=500,
-            detail="Server API key is not configured"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated"
         )
-
-    if not api_key or not secrets.compare_digest(
-        api_key, CHAT_API_KEY
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid API key"
-        )
-
-    return True
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        return user_id
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
