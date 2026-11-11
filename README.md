@@ -37,3 +37,39 @@ SoftComputing/
 │   └── package.json
 │
 └── README.md
+
+
+
+SOFT_COMPUTING_PROJECT\VIDEO_SUMMARIZER_BACKEND\APP
+│   ingest.py
+│   main.py
+│   __init__.py
+│   
+├───api
+│   │   __init__.py
+│   │   
+│   └───routes
+│           chat.py
+│           __init__.py
+│           
+├───core
+│       config.py
+│       security.py
+│       __init__.py
+│       
+├───schemas
+│       chat.py
+│       __init__.py
+│       
+├───services
+│       chat_service.py
+│       llm.py
+│       retriever.py
+│       text_splitter.py
+│       url_transcript.py
+│       vector_store.py
+│       __init__.py
+│       
+└───utils
+        prompts.py
+        __init__.py
