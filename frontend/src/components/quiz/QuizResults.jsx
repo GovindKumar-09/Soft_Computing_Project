@@ -9,7 +9,7 @@ import {
   BookOpen
 } from 'lucide-react'
 
-function QuizResults({ questions, answers, score, onRetake }) {
+function QuizResults({ questions, answers, score, onRetake, lectureId }) {
   const percentage = questions.length
     ? Math.round((score / questions.length) * 100)
     : 0
@@ -158,7 +158,7 @@ function QuizResults({ questions, answers, score, onRetake }) {
       </section>
 
       <Link
-        to="/notes"
+        to={lectureId ? `/notes/${lectureId}` : '/notes'}
         className="glass-card p-5 flex items-center justify-between gap-4 hover:border-indigo-500/40 transition-colors"
       >
         <div className="flex items-center gap-3">

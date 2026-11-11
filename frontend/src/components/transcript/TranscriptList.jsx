@@ -5,7 +5,6 @@ import TranscriptSegment from './TranscriptSegment'
 function TranscriptList({
   segments,
   totalCount,
-  search,
   activeSegment,
   onSelect,
   highlightText,

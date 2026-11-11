@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom'
 import {
   Code2,
   BookOpen,
-  Brain,
-  MessageCircle,
   Sparkles,
   ChevronRight
 } from 'lucide-react'

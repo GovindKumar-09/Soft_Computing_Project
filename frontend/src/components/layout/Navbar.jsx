@@ -1,12 +1,14 @@
 
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { Play, ArrowRight, Menu, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'motion/react'
+import { useAuth } from '../../app/useAuth'
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
+  const { user, isAuthenticated, logout } = useAuth()
 
   const links = [
     { name: 'Home', path: '/' },
@@ -14,10 +16,6 @@ function Navbar() {
     { name: 'My Lectures', path: '/lectures' },
     { name: 'Quiz', path: '/quiz' }
   ]
-
-  useEffect(() => {
-    setMenuOpen(false)
-  }, [location.pathname, location.hash])
 
   const isLinkActive = (link) => {
     if (link.name === 'Home') {
@@ -103,6 +101,7 @@ function Navbar() {
                 <a
                   key={link.name}
                   href="/#features"
+                  onClick={() => setMenuOpen(false)}
                   className={className}
                 >
                   {active && activeIndicator}
@@ -113,6 +112,7 @@ function Navbar() {
                   key={link.name}
                   to={link.path}
                   end={link.path === '/'}
+                  onClick={() => setMenuOpen(false)}
                   className={className}
                 >
                   {active && activeIndicator}
@@ -126,12 +126,14 @@ function Navbar() {
           {/* Desktop Actions */}
           <div className="relative z-10 hidden md:flex items-center gap-3 shrink-0">
 
-            <Link
-              to="/login"
-              className="text-sm font-medium text-slate-300 hover:text-white px-3 py-2 transition-colors"
-            >
-              Sign in
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <span className="text-sm text-slate-400">{user?.name || user?.email}</span>
+                <button type="button" onClick={logout} className="text-sm font-medium text-slate-300 hover:text-white px-3 py-2 transition-colors">Sign out</button>
+              </>
+            ) : (
+              <Link to="/login" className="text-sm font-medium text-slate-300 hover:text-white px-3 py-2 transition-colors">Sign in</Link>
+            )}
 
             {/* Neon Upload Button */}
             <motion.div
@@ -188,6 +190,7 @@ function Navbar() {
                   <a
                     key={link.name}
                     href="/#features"
+                    onClick={() => setMenuOpen(false)}
                     className={className}
                   >
                     {link.name}
@@ -197,6 +200,7 @@ function Navbar() {
                     key={link.name}
                     to={link.path}
                     end={link.path === '/'}
+                    onClick={() => setMenuOpen(false)}
                     className={className}
                   >
                     {link.name}
@@ -206,12 +210,14 @@ function Navbar() {
             </div>
 
             <div className="border-t border-white/10 mt-3 pt-3 space-y-2">
-              <Link
-                to="/login"
-                className="block text-center text-sm text-slate-300 hover:text-white py-2"
-              >
-                Sign in
-              </Link>
+              {isAuthenticated ? (
+                <div className="flex items-center justify-between px-2">
+                  <span className="text-sm text-slate-400 truncate">{user?.name || user?.email}</span>
+                  <button type="button" onClick={logout} className="text-sm text-slate-300 hover:text-white py-2">Sign out</button>
+                </div>
+              ) : (
+                <Link to="/login" className="block text-center text-sm text-slate-300 hover:text-white py-2">Sign in</Link>
+              )}
 
               <Link
                 to="/upload"

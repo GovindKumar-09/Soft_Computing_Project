@@ -1,38 +1,56 @@
 
-import { Link } from 'react-router-dom'
-import { FileText, Brain, MessageCircle, ArrowRight } from 'lucide-react'
-
-const links = [
-  {
-    path: '/transcript',
-    title: 'Transcript',
-    description: 'Revisit the original lecture text and timestamps.',
-    action: 'Read transcript',
-    icon: FileText,
-    color: 'text-indigo-300',
-    border: 'hover:border-indigo-500/40'
-  },
-  {
-    path: '/quiz',
-    title: 'Take a quiz',
-    description: 'Check your understanding with interactive questions.',
-    action: 'Test yourself',
-    icon: Brain,
-    color: 'text-amber-300',
-    border: 'hover:border-amber-400/40'
-  },
-  {
-    path: '/chat',
-    title: 'Ask AI Tutor',
-    description: 'Ask questions and explore difficult concepts.',
-    action: 'Start chatting',
-    icon: MessageCircle,
-    color: 'text-violet-300',
-    border: 'hover:border-violet-400/40'
-  }
-]
+import { Link, useParams, useLocation } from 'react-router-dom'
+import { FileText, Brain, MessageCircle, ArrowRight, AudioLines } from 'lucide-react'
 
 function LearningLinks() {
+  const params = useParams()
+  const location = useLocation()
+
+  // Resolve lecture ID from wherever Notes got it
+  const lectureId =
+    params.lectureId ||
+    location.state?.lectureId ||
+    ''
+
+  const links = [
+    {
+      path: lectureId ? `/transcript/${lectureId}` : '/transcript',
+      title: 'Read transcript',
+      description: 'Search and revisit the combined transcript for this lecture.',
+      action: 'Open transcript',
+      icon: AudioLines,
+      color: 'text-cyan-300',
+      border: 'hover:border-cyan-400/40'
+    },
+    {
+      path: lectureId ? `/quiz/${lectureId}` : '/quiz',
+      title: 'Take a quiz',
+      description: 'AI-generated questions from your lecture content.',
+      action: 'Test yourself',
+      icon: Brain,
+      color: 'text-amber-300',
+      border: 'hover:border-amber-400/40'
+    },
+    {
+      path: lectureId ? `/chat/${lectureId}` : '/chat',
+      title: 'Ask AI Tutor',
+      description: 'Ask questions and explore difficult concepts.',
+      action: 'Start chatting',
+      icon: MessageCircle,
+      color: 'text-violet-300',
+      border: 'hover:border-violet-400/40'
+    },
+    {
+      path: '/lectures',
+      title: 'My Lectures',
+      description: 'Revisit all your uploaded lecture recordings.',
+      action: 'View library',
+      icon: FileText,
+      color: 'text-indigo-300',
+      border: 'hover:border-indigo-500/40'
+    }
+  ]
+
   return (
     <section className="pb-24">
       <div className="mb-7">
@@ -44,7 +62,7 @@ function LearningLinks() {
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
         {links.map(item => {
           const Icon = item.icon
 

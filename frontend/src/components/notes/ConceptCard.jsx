@@ -2,11 +2,17 @@
 function ConceptCard({ item, index }) {
   const title = typeof item === 'string'
     ? item
-    : item.title || item.name || `Concept ${index + 1}`
+    : item.concept ||
+      item.title ||
+      item.name ||
+      `Concept ${index + 1}`
 
   const description = typeof item === 'string'
     ? ''
-    : item.description || item.explanation || item.text || ''
+    : item.explanation ||
+      item.description ||
+      item.text ||
+      ''
 
   return (
     <article className="glass-card p-6 hover:border-indigo-500/40 transition-colors">
@@ -16,7 +22,10 @@ function ConceptCard({ item, index }) {
         </div>
 
         <div>
-          <h3 className="text-white text-base font-bold">{title}</h3>
+          <h3 className="text-white text-base font-bold">
+            {title}
+          </h3>
+
           <p className="text-slate-400 text-sm leading-7 mt-3">
             {description}
           </p>

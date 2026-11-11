@@ -1,11 +1,12 @@
 
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Mail, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Mail, ArrowRight, AlertCircle } from 'lucide-react'
 
 import AuthLayout from '../components/auth/AuthLayout'
 import AuthInput from '../components/auth/AuthInput'
 import PasswordInput from '../components/auth/PasswordInput'
+import { useAuth } from '../app/useAuth'
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -15,6 +16,10 @@ function Login() {
   })
 
   const [message, setMessage] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const { login } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const handleChange = event => {
     const { name, value, checked, type } = event.target
@@ -27,12 +32,18 @@ function Login() {
     setMessage('')
   }
 
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     event.preventDefault()
-
-    setMessage(
-      'Login form validated! Sign-in will work once backend authentication is connected.'
-    )
+    setSubmitting(true)
+    setMessage('')
+    try {
+      await login(formData.email.trim(), formData.password, formData.remember)
+      navigate(location.state?.from?.pathname || '/lectures', { replace: true })
+    } catch (error) {
+      setMessage(error.message || 'Unable to sign in.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -90,17 +101,18 @@ function Login() {
         </label>
 
         {message && (
-          <div className="flex items-start gap-2 rounded-xl border border-indigo-500/20 bg-indigo-500/10 p-3 text-xs text-indigo-200 leading-5">
-            <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
+          <div role="alert" className="flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-200 leading-5">
+            <AlertCircle size={16} className="shrink-0 mt-0.5" />
             {message}
           </div>
         )}
 
         <button
           type="submit"
+          disabled={submitting}
           className="gradient-button w-full flex items-center justify-center gap-2 py-4 rounded-xl text-white font-bold text-sm"
         >
-          Sign in <ArrowRight size={17} />
+          {submitting ? 'Signing in…' : 'Sign in'} <ArrowRight size={17} />
         </button>
       </form>
 

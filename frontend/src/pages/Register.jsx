@@ -1,16 +1,17 @@
 
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   User,
   Mail,
   ArrowRight,
-  CheckCircle2
+  AlertCircle
 } from 'lucide-react'
 
 import AuthLayout from '../components/auth/AuthLayout'
 import AuthInput from '../components/auth/AuthInput'
 import PasswordInput from '../components/auth/PasswordInput'
+import { useAuth } from '../app/useAuth'
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -22,6 +23,9 @@ function Register() {
   })
 
   const [message, setMessage] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const { register } = useAuth()
+  const navigate = useNavigate()
 
   const handleChange = event => {
     const { name, value, type, checked } = event.target
@@ -34,7 +38,7 @@ function Register() {
     setMessage('')
   }
 
-  const handleSubmit = event => {
+  const handleSubmit = async event => {
     event.preventDefault()
     setMessage('')
 
@@ -53,9 +57,15 @@ function Register() {
       return
     }
 
-    setMessage(
-      'Your form is valid! Account creation will be enabled after backend authentication is connected.'
-    )
+    setSubmitting(true)
+    try {
+      await register(formData.name.trim(), formData.email.trim(), formData.password)
+      navigate('/lectures', { replace: true })
+    } catch (error) {
+      setMessage(error.message || 'Unable to create your account.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -135,17 +145,18 @@ function Register() {
         </label>
 
         {message && (
-          <div className="flex gap-2 items-start rounded-xl border border-indigo-500/20 bg-indigo-500/10 p-3 text-xs text-indigo-200 leading-5">
-            <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
+          <div role="alert" className="flex gap-2 items-start rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-200 leading-5">
+            <AlertCircle size={16} className="shrink-0 mt-0.5" />
             {message}
           </div>
         )}
 
         <button
           type="submit"
+          disabled={submitting}
           className="gradient-button w-full flex items-center justify-center gap-2 py-4 rounded-xl text-white font-bold text-sm"
         >
-          Create account <ArrowRight size={17} />
+          {submitting ? 'Creating account…' : 'Create account'} <ArrowRight size={17} />
         </button>
       </form>
 

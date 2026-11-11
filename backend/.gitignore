@@ -1,0 +1,9 @@
+venv/
+env/
+.env
+.env.*
+_pycache_/
+*.py[cod]
+.vscode/
+.ipynb_checkpoints/
+*.log

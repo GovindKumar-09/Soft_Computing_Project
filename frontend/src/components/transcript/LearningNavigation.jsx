@@ -23,7 +23,7 @@ const learningLinks = [
   }
 ]
 
-function LearningNavigation() {
+function LearningNavigation({ lectureId }) {
   return (
     <section className="pb-24">
       <div className="mb-7">
@@ -47,7 +47,7 @@ function LearningNavigation() {
           return (
             <Link
               key={item.path}
-              to={item.path}
+              to={lectureId ? `${item.path}/${lectureId}` : item.path}
               className={`group glass-card p-6 sm:p-7 transition-all ${item.border}`}
             >
               <div className="flex items-center justify-between mb-6">
