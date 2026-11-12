@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Mail, ArrowRight, AlertCircle } from 'lucide-react'
@@ -8,7 +9,6 @@ import PasswordInput from '../components/auth/PasswordInput'
 import { useAuth } from '../app/useAuth'
 
 function Login() {
-  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -30,7 +30,6 @@ function Login() {
     }))
 
     setMessage('')
-    setError('')
   }
 
   const handleSubmit = async event => {
@@ -85,7 +84,6 @@ function Login() {
           onChange={handleChange}
           placeholder="Enter your password"
           autoComplete="current-password"
-          required
         />
 
         <label className="flex items-center gap-3 cursor-pointer">
@@ -102,15 +100,6 @@ function Login() {
           </span>
         </label>
 
-        {/* Error Alert */}
-        {error && (
-          <div className="flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-300 leading-5">
-            <AlertCircle size={16} className="shrink-0 mt-0.5" />
-            {error}
-          </div>
-        )}
-
-        {/* Success Alert */}
         {message && (
           <div role="alert" className="flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-200 leading-5">
             <AlertCircle size={16} className="shrink-0 mt-0.5" />

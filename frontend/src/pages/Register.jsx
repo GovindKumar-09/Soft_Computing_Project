@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -13,11 +14,12 @@ import PasswordInput from '../components/auth/PasswordInput'
 import { useAuth } from '../app/useAuth'
 
 function Register() {
-  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: '',
+    agree: false
   })
 
   const [message, setMessage] = useState('')
@@ -26,39 +28,23 @@ function Register() {
   const navigate = useNavigate()
 
   const handleChange = event => {
-    const { name, value } = event.target
+    const { name, value, type, checked } = event.target
 
     setFormData(previous => ({
       ...previous,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }))
 
     setMessage('')
-    setError('')
   }
 
   const handleSubmit = async event => {
     event.preventDefault()
     setMessage('')
-    setError('')
-    setLoading(true)
 
-    try {
-      // Direct FastAPI register API call
-      const res = await registerUser(formData.name, formData.email, formData.password)
-
-      if (res.success) {
-        setMessage('Registration successful! Redirecting to login...')
-        setTimeout(() => {
-          navigate('/login')
-        }, 1000)
-      }
-    } catch (err) {
-      setError(
-        err.response?.data?.detail || 'Registration failed. Please try again.'
-      )
-    } finally {
-      setLoading(false)
+    if (formData.password.length < 8) {
+      setMessage('Password must contain at least 8 characters.')
+      return
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -84,9 +70,9 @@ function Register() {
 
   return (
     <AuthLayout
-      eyebrow="Get started"
-      title="Create an account."
-      description="Start transforming your lectures into notes and quizzes."
+      eyebrow="Start your learning journey"
+      title="Create your account"
+      description="One account. A smarter way to learn."
       footer={
         <p className="text-center text-sm text-slate-400 mt-7">
           Already have an account?{' '}
@@ -100,14 +86,16 @@ function Register() {
       }
     >
       <form onSubmit={handleSubmit} className="space-y-5">
+
         <AuthInput
-          label="Full Name"
+          label="Full name"
           icon={User}
           type="text"
           name="name"
           value={formData.name}
           onChange={handleChange}
-          placeholder="Govind Kumar"
+          placeholder="Enter your full name"
+          autoComplete="name"
           required
         />
 
@@ -128,20 +116,34 @@ function Register() {
           name="password"
           value={formData.password}
           onChange={handleChange}
-          placeholder="Create a strong password"
+          placeholder="At least 8 characters"
           autoComplete="new-password"
-          required
+          minLength={8}
         />
 
-        {/* Error Alert */}
-        {error && (
-          <div className="flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-300 leading-5">
-            <AlertCircle size={16} className="shrink-0 mt-0.5" />
-            {error}
-          </div>
-        )}
+        <PasswordInput
+          label="Confirm password"
+          name="confirmPassword"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          placeholder="Re-enter your password"
+          autoComplete="new-password"
+        />
 
-        {/* Success Alert */}
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            name="agree"
+            checked={formData.agree}
+            onChange={handleChange}
+            className="mt-1 accent-indigo-500"
+          />
+
+          <span className="text-xs text-slate-400 leading-5">
+            I agree to the Terms and Conditions and Privacy Policy.
+          </span>
+        </label>
+
         {message && (
           <div role="alert" className="flex gap-2 items-start rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-200 leading-5">
             <AlertCircle size={16} className="shrink-0 mt-0.5" />
@@ -157,9 +159,19 @@ function Register() {
           {submitting ? 'Creating account…' : 'Create account'} <ArrowRight size={17} />
         </button>
       </form>
+
+      <div className="relative my-7">
+        <div className="border-t border-white/10" />
+        <span className="absolute left-1/2 -translate-x-1/2 -top-2.5 bg-[#111020] px-3 text-[10px] text-slate-500">
+          OR
+        </span>
+      </div>
+
+      <p className="text-center text-xs text-slate-400">
+        Your learning workspace starts here.
+      </p>
     </AuthLayout>
   )
 }
 
-// CRITICAL FIX: Default export must be present
 export default Register

@@ -21,45 +21,68 @@ function Navbar() {
     if (link.name === 'Home') {
       return location.pathname === '/' && !location.hash
     }
+
+    if (link.name === 'Features') {
+      return location.pathname === '/' && location.hash === '#features'
+    }
+
+    return location.pathname === link.path
   }
 
+  const handleMouseMove = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+
+    event.currentTarget.style.setProperty(
+      '--mouse-x',
+      `${event.clientX - rect.left}px`
+    )
+
+    event.currentTarget.style.setProperty(
+      '--mouse-y',
+      `${event.clientY - rect.top}px`
+    )
+  }
+
+  const activeIndicator = (
+    <motion.span
+      layoutId="activeTab"
+      className="absolute inset-0 -z-10 rounded-full border border-violet-300/20 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 shadow-[0_0_12px_rgba(139,92,246,0.5),0_0_28px_rgba(139,92,246,0.25),inset_0_1px_0_rgba(255,255,255,0.2)]"
+      transition={{
+        type: 'spring',
+        stiffness: 300,
+        damping: 30
+      }}
+    />
+  )
+
   return (
-    <header className="flex items-center justify-between px-6 py-4">
-      {/* Brand Logo */}
-      <Link to="/" className="text-xl font-bold text-white flex items-center gap-2">
-        <span className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">▶</span>
-        AI Learning Assistant
-      </Link>
+    <nav className="relative z-50 px-4 pt-5">
+      <div className="max-w-7xl mx-auto">
 
-      {/* Navigation Links */}
-      <div className="flex items-center gap-6">
-        <Link to="/" className="text-sm text-slate-300 hover:text-white">Home</Link>
-        <Link to="/features" className="text-sm text-slate-300 hover:text-white">Features</Link>
-        {user && (
-          <Link to="/lectures" className="text-sm text-slate-300 hover:text-white">My Lectures</Link>
-        )}
-      </div>
+        {/* Floating Navbar */}
+        <div
+          onMouseMove={handleMouseMove}
+          className="group relative isolate flex items-center justify-between gap-4 rounded-full border border-white/[0.09] bg-[#100d1c]/85 backdrop-blur-2xl px-4 sm:px-6 py-3 shadow-[0_8px_40px_rgba(0,0,0,0.35)] hover:shadow-[0_8px_45px_rgba(139,92,246,0.18)] transition-shadow duration-500"
+        >
 
-      {/* Auth Actions (Login vs Logged In User) */}
-      <div className="flex items-center gap-4">
-        {user ? (
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-indigo-200">
-              {user.name}
+          {/* Cursor Following Glow */}
+          <div
+            className="pointer-events-none absolute inset-0 -z-10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            style={{
+              background:
+                'radial-gradient(280px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(139, 92, 246, 0.20), transparent 75%)'
+            }}
+          />
+
+          {/* Logo */}
+          <Link to="/" className="relative z-10 flex items-center gap-3 shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]">
+              <Play size={17} fill="white" />
+            </div>
+
+            <span className="text-white font-bold text-base sm:text-lg tracking-tight">
+              AI Learning <span className="text-indigo-400">Assistant</span>
             </span>
-            <button
-              onClick={handleLogout}
-              className="px-3 py-1.5 text-xs rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 border border-red-500/30 transition-all"
-            >
-              Logout
-            </button>
-          </div>
-        ) : (
-          <Link
-            to="/login"
-            className="text-sm font-semibold text-slate-300 hover:text-white"
-          >
-            Sign in
           </Link>
 
           {/* Segmented Navigation */}
@@ -206,15 +229,9 @@ function Navbar() {
           </motion.div>
         )}
 
-        <Link
-          to={user ? "/upload" : "/login"}
-          className="gradient-button px-4 py-2 rounded-xl text-white font-semibold text-sm flex items-center gap-2"
-        >
-          Upload a lecture →
-        </Link>
       </div>
-    </header>
+    </nav>
   )
 }
 
-export default Header
+export default Navbar
