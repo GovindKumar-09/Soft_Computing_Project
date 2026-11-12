@@ -2,8 +2,13 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { motion } from 'motion/react'
+import { useAuth } from '../../app/useAuth'
 
 function BottomCTA() {
+  const { isAuthenticated } = useAuth()
+
+  if (isAuthenticated) return null
+
   return (
     <section className="max-w-7xl mx-auto px-6 lg:px-8 mb-24">
       <motion.div

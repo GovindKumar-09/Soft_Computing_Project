@@ -8,7 +8,7 @@ import {
   CheckCircle2,
   LoaderCircle,
   BookOpen,
-  Play,
+  MessageCircle,
   ArrowUpRight
 } from 'lucide-react'
 
@@ -18,7 +18,7 @@ function DashboardLectureCard({
   formatDate,
   formatDuration
 }) {
-  const id = lecture._id || lecture.id
+  const id = lecture.lectureId || lecture.id || lecture._id
   const status = getStatus(lecture)
 
   const isCompleted = status === 'completed'
@@ -78,22 +78,39 @@ function DashboardLectureCard({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-slate-500 text-xs mt-5 pt-4 border-t border-white/[0.07]">
+        {/* SUMMARY PREVIEW */}
+        {lecture.summaryPreview && (
+          <p className="text-slate-500 text-xs mt-3 leading-5 line-clamp-2">
+            {lecture.summaryPreview}
+          </p>
+        )}
+
+        <div className="flex items-center gap-2 text-slate-500 text-xs mt-4 pt-4 border-t border-white/[0.07]">
           <CalendarDays size={14} />
           {formatDate(lecture.date || lecture.createdAt)}
         </div>
 
         {isCompleted ? (
-          <Link
-            to={id ? `/transcript/${id}` : '/transcript'}
-            className="mt-5 w-full flex items-center justify-center gap-2 bg-white text-slate-950 py-3 rounded-xl text-xs font-bold hover:bg-indigo-100 transition-colors"
-          >
-            <Play size={14} fill="currentColor" />
-            Open lecture
-            <ArrowUpRight size={14} />
-          </Link>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <Link
+              to={id ? `/notes/${id}` : '/notes'}
+              className="flex items-center justify-center gap-1.5 bg-white text-slate-950 py-2.5 rounded-xl text-xs font-bold hover:bg-indigo-100 transition-colors"
+            >
+              <FileText size={13} />
+              Notes
+              <ArrowUpRight size={12} />
+            </Link>
+
+            <Link
+              to={id ? `/chat/${id}` : '/chat'}
+              className="flex items-center justify-center gap-1.5 bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 py-2.5 rounded-xl text-xs font-bold hover:bg-indigo-600/30 transition-colors"
+            >
+              <MessageCircle size={13} />
+              Ask AI
+            </Link>
+          </div>
         ) : (
-          <div className="mt-5 w-full flex items-center justify-center gap-2 bg-white/[0.05] text-slate-400 py-3 rounded-xl text-xs font-semibold">
+          <div className="mt-4 w-full flex items-center justify-center gap-2 bg-white/[0.05] text-slate-400 py-3 rounded-xl text-xs font-semibold">
             {isFailed ? 'Processing failed' : 'Being processed'}
           </div>
         )}

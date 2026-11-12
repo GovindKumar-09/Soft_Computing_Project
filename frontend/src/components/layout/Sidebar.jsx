@@ -4,7 +4,6 @@ import {
   Video,
   Upload,
   MessageCircle,
-  Settings,
   Sparkles,
   ChevronLeft,
   ChevronRight

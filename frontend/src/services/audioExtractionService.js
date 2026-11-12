@@ -103,17 +103,18 @@ export async function extractAudioFromVideo(file, onStatus) {
     throw new Error(
       error.message?.includes('audio')
         ? error.message
-        : 'Could not extract audio. Check that the video contains an audio track and try another file.'
+        : 'Could not extract audio. Check that the video contains an audio track and try another file.',
+      { cause: error }
     )
 
   } finally {
     // Release temporary files from FFmpeg's virtual filesystem
     try {
       await ffmpeg.deleteFile(inputName)
-    } catch {}
+    } catch { /* The file may not have been created. */ }
 
     try {
       await ffmpeg.deleteFile(outputName)
-    } catch {}
+    } catch { /* The file may already have been removed. */ }
   }
 }

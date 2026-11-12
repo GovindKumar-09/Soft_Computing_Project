@@ -13,7 +13,9 @@ function ChatWindow({
   onSend,
   onCopy,
   copiedId,
-  onSuggestion
+  onSuggestion,
+  sending,
+  hasLecture
 }) {
   const bottomRef = useRef(null)
 
@@ -28,6 +30,8 @@ function ChatWindow({
     }
   }
 
+  const isConnected = hasLecture
+
   return (
     <section className="bg-slate-900/50 border border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl shadow-black/20">
 
@@ -39,12 +43,10 @@ function ChatWindow({
           </div>
 
           <div>
-            <h2 className="text-white text-sm font-bold">
-              AI Study Tutor
-            </h2>
-            <p className="text-emerald-400 text-[10px] mt-1 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              Interface ready
+            <h2 className="text-white text-sm font-bold">AI Study Tutor</h2>
+            <p className={`text-[10px] mt-1 flex items-center gap-1.5 ${isConnected ? 'text-emerald-400' : 'text-slate-500'}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+              {isConnected ? 'RAG active — grounded in your lecture' : 'Select a lecture to activate'}
             </p>
           </div>
         </div>
@@ -70,7 +72,7 @@ function ChatWindow({
       </div>
 
       {/* SUGGESTED QUESTIONS */}
-      {messages.length === 1 && (
+      {messages.length === 1 && hasLecture && (
         <SuggestedQuestions onSelect={onSuggestion} />
       )}
 
@@ -80,6 +82,8 @@ function ChatWindow({
         onChange={setInput}
         onSend={onSend}
         onKeyDown={handleKeyDown}
+        sending={sending}
+        hasLecture={hasLecture}
       />
     </section>
   )

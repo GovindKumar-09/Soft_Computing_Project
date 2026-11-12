@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Mail, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Mail, ArrowRight, AlertCircle } from 'lucide-react'
 
 import AuthLayout from '../components/auth/AuthLayout'
 import AuthInput from '../components/auth/AuthInput'
 import PasswordInput from '../components/auth/PasswordInput'
-import { loginUser } from '../services/authService'
+import { useAuth } from '../app/useAuth'
 
 function Login() {
   const navigate = useNavigate()
@@ -16,8 +16,10 @@ function Login() {
   })
 
   const [message, setMessage] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const { login } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const handleChange = event => {
     const { name, value, checked, type } = event.target
@@ -33,26 +35,15 @@ function Login() {
 
   const handleSubmit = async event => {
     event.preventDefault()
+    setSubmitting(true)
     setMessage('')
-    setError('')
-    setLoading(true)
-
     try {
-      // Direct FastAPI login API call
-      const res = await loginUser(formData.email, formData.password)
-      
-      if (res.success) {
-        setMessage('Login successful! Redirecting...')
-        setTimeout(() => {
-          navigate('/')
-        }, 800)
-      }
-    } catch (err) {
-      setError(
-        err.response?.data?.detail || 'Login failed. Please check your credentials.'
-      )
+      await login(formData.email.trim(), formData.password, formData.remember)
+      navigate(location.state?.from?.pathname || '/lectures', { replace: true })
+    } catch (error) {
+      setMessage(error.message || 'Unable to sign in.')
     } finally {
-      setLoading(false)
+      setSubmitting(false)
     }
   }
 
@@ -121,18 +112,18 @@ function Login() {
 
         {/* Success Alert */}
         {message && (
-          <div className="flex items-start gap-2 rounded-xl border border-indigo-500/20 bg-indigo-500/10 p-3 text-xs text-indigo-200 leading-5">
-            <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
+          <div role="alert" className="flex items-start gap-2 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-200 leading-5">
+            <AlertCircle size={16} className="shrink-0 mt-0.5" />
             {message}
           </div>
         )}
 
         <button
           type="submit"
-          disabled={loading}
-          className="gradient-button w-full flex items-center justify-center gap-2 py-4 rounded-xl text-white font-bold text-sm disabled:opacity-50"
+          disabled={submitting}
+          className="gradient-button w-full flex items-center justify-center gap-2 py-4 rounded-xl text-white font-bold text-sm"
         >
-          {loading ? 'Signing in...' : 'Sign in'} <ArrowRight size={17} />
+          {submitting ? 'Signing in…' : 'Sign in'} <ArrowRight size={17} />
         </button>
       </form>
 

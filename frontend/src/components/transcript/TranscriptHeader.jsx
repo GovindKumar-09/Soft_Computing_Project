@@ -10,7 +10,7 @@ import {
   Sparkles
 } from 'lucide-react'
 
-function TranscriptHeader({ copied, onCopy, subject = 'Operating Systems', duration = '05:25' }) {
+function TranscriptHeader({ copied, onCopy, subject = 'Lecture', duration = 'Duration unavailable', title = 'Smart Transcript.', isSample = false }) {
   return (
     <section className="pt-16 sm:pt-20 pb-12">
       <Link
@@ -29,7 +29,7 @@ function TranscriptHeader({ copied, onCopy, subject = 'Operating Systems', durat
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.12]">
-            Smart <span className="gradient-text">Transcript.</span>
+            {title === 'Smart Transcript.' ? <>Smart <span className="gradient-text">Transcript.</span></> : title}
           </h1>
 
           <p className="text-slate-400 text-base sm:text-lg leading-8 mt-6 max-w-2xl">
@@ -43,14 +43,14 @@ function TranscriptHeader({ copied, onCopy, subject = 'Operating Systems', durat
               {subject}
             </span>
 
-            <span className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white/[0.04] border border-white/10 text-slate-400 text-xs">
+            {duration && <span className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white/[0.04] border border-white/10 text-slate-400 text-xs">
               <Clock size={13} />
               {duration} minutes
-            </span>
+            </span>}
 
             <span className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs">
               <Sparkles size={13} />
-              Sample transcript
+              {isSample ? 'Sample transcript' : 'Saved lecture'}
             </span>
           </div>
         </div>

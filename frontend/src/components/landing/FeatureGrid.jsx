@@ -1,5 +1,6 @@
 
 import { useRef } from 'react'
+import { motion, useReducedMotion } from 'motion/react'
 import {
   Code2,
   BookOpen,
@@ -363,6 +364,8 @@ function FeatureCard({ feature, index }) {
 }
 
 function FeatureGrid() {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <section id="features" className="scroll-mt-24 relative overflow-hidden px-5 py-24 sm:px-8 lg:px-12">
       <div className="pointer-events-none absolute left-1/2 top-1/3 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-violet-700/[0.09] blur-[140px]" />
@@ -393,11 +396,19 @@ function FeatureGrid() {
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {features.map((feature, index) => (
-            <FeatureCard
+            <motion.div
               key={feature.id}
-              feature={feature}
-              index={index}
-            />
+              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 72 }}
+              whileInView={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.18 }}
+              transition={{
+                duration: shouldReduceMotion ? 0.2 : 0.65,
+                delay: shouldReduceMotion ? 0 : index * 0.14,
+                ease: [0.22, 1, 0.36, 1]
+              }}
+            >
+              <FeatureCard feature={feature} index={index} />
+            </motion.div>
           ))}
         </div>
       </div>

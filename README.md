@@ -1,80 +1,42 @@
-<<<<<<< HEAD
-# AI-Powered Lecture Review Platform
+# AI-Powered Lecture Learning Assistant
 
-Speech Recognition and Retrieval-Augmented Generation for Time-Stamped Study Assistance.
+React/Vite frontend and FastAPI backend for authenticated lecture uploads, speech-to-text, structured study notes, lecture-specific RAG chat, and generated quizzes.
 
-## Overview
-This platform allows students to efficiently study from recorded lectures by converting audio into time-stamped, searchable transcripts using OpenAI Whisper. Built on a Retrieval-Augmented Generation (RAG) architecture, it uses Google Gemini and Pinecone to answer student questions strictly from the lecture context, providing clickable timestamp citations. 
+## Local setup
 
-## Core Features
-*   **Browser Audio Extraction**: Uses `FFmpeg.wasm` to extract audio tracks locally in the browser, saving server upload bandwidth and processing time.
-*   **Time-Stamped Grounding**: Every AI-generated answer includes source markers (timestamps), allowing students to click and jump to the exact moment in the transcript.
-*   **Instructor in the Loop**: Lecturers maintain control by correcting technical terms in the transcript and approving AI-generated quizzes before they are published to students.
-*   **Fuzzy Logic Recommendations**: Uses a fuzzy membership function to evaluate quiz accuracy and rank weak topics for targeted revision recommendations.
+1. Copy `backend/.env.example` to `backend/.env`, add your MongoDB, Groq, Gemini, and Pinecone credentials, and set `JWT_SECRET` to a cryptographically random value of at least 32 characters. Keep `.env` private and out of version control.
+2. In PowerShell, start the backend:
 
-## Technology Stack
-*   **Frontend**: React, Vite, Tailwind CSS
-*   **Backend**: Node.js, Express, Mongoose, JWT
-*   **Databases**: MongoDB (Application data), Pinecone (Vector database)
-*   **AI Services**: OpenAI Whisper API, Google Gemini API
+   ```powershell
+   cd backend
+   .\.venv\Scripts\Activate.ps1
+   python -m uvicorn main:app --host 127.0.0.1 --port 8000
+   ```
 
-## Project Structure
-```text
-SoftComputing/
-│
-├── backend/
-│   ├── routes/          # API endpoints (auth, processing, chat, etc.)
-│   ├── utils/           # AI configs and Fuzzy logic helpers
-│   ├── server.js        # Main Express entry point
-│   ├── .env             # API keys and secrets
-│   └── package.json
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/  # React components (Upload, Chat, etc.)
-│   │   ├── App.jsx      # Main layout
-│   │   └── main.jsx
-│   ├── .env             # Frontend environment variables
-│   └── package.json
-│
-└── README.md
+3. Copy `frontend/.env.example` to `frontend/.env` if needed. From another terminal:
 
+   ```powershell
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
+4. Create an account in the app, upload a lecture, and open its Notes, Transcript, Quiz, or AI Chat page. The backend stores users and lectures in `youtube_video_rag`.
 
-SOFT_COMPUTING_PROJECT\VIDEO_SUMMARIZER_BACKEND\APP
-│   ingest.py
-│   main.py
-│   __init__.py
-│   
-├───api
-│   │   __init__.py
-│   │   
-│   └───routes
-│           chat.py
-│           __init__.py
-│           
-├───core
-│       config.py
-│       security.py
-│       __init__.py
-│       
-├───schemas
-│       chat.py
-│       __init__.py
-│       
-├───services
-│       chat_service.py
-│       llm.py
-│       retriever.py
-│       text_splitter.py
-│       url_transcript.py
-│       vector_store.py
-│       __init__.py
-│       
-└───utils
-        prompts.py
-        __init__.py
-=======
-# AI-Learning-Assistant
-AI Learning Assistance 
->>>>>>> origin/my_frontend
+## Processing flow
+
+The browser extracts audio from video with FFmpeg.wasm. FastAPI transcribes it with Groq Whisper, saves the combined transcript, generates structured notes with the Groq LangChain model, and indexes transcript chunks in Pinecone with `video_id` and authenticated email metadata. Chat retrieval filters by both values. Quiz questions are generated from the selected lecture transcript.
+
+`GET /api/health` reports backend, MongoDB, Groq, Gemini, and Pinecone configuration. Cloud provider calls require valid credentials, network access, and an appropriately configured Pinecone index.
+
+## Backend modules
+
+- `backend/main.py` assembles the FastAPI app, middleware, routers, and health endpoint.
+- `backend/app/api/routes/` contains HTTP validation, authentication, and response handling.
+- `backend/app/core/` owns configuration, MongoDB connections, and authentication primitives.
+- `backend/app/services/` owns uploads, transcription, lecture processing, summaries, quizzes, embeddings, retrieval, and chat.
+- `backend/app/services/chains.py` builds LangChain Expression Language chains by composing prompt templates, the shared chat model, and `StrOutputParser`. Summary generation, quiz generation, and RAG answers all use these chains.
+
+## Authentication
+
+Registration and login issue 12-hour HMAC-signed bearer tokens. Passwords are stored as salted PBKDF2-SHA256 hashes. By default, the browser keeps a session token until the tab session ends; “Remember me” persists it in local storage. The API derives lecture ownership from the verified account and checks ownership on lecture, transcript, quiz, video, ingestion, and chat operations. Use HTTPS in deployment and keep `JWT_SECRET` stable and private.

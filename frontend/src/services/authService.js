@@ -1,25 +1,60 @@
-import api from './api';
+const API_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '')
+const STORAGE_KEY = 'lecture_assistant_auth'
 
-// 1. Register User API Call
-export const registerUser = async (name, email, password) => {
-    const response = await api.post('/api/auth/register', { name, email, password });
-    return response.data;
-};
+export function getAuthSession() {
+  for (const key of ['localStorage', 'sessionStorage']) {
+    try {
+      const storage = window[key]
+      const value = storage.getItem(STORAGE_KEY)
+      if (value) return JSON.parse(value)
+    } catch {
+      // Storage can be disabled by browser privacy settings.
+    }
+  }
+  return null
+}
 
-// 2. Login User API Call
-export const loginUser = async (email, password) => {
-    const response = await api.post('/api/auth/login', { email, password });
-    return response.data;
-};
+export function getAccessToken() {
+  return getAuthSession()?.access_token || ''
+}
 
-// 3. Get Current Logged In User
-export const getCurrentUser = async () => {
-    const response = await api.get('/api/auth/me');
-    return response.data;
-};
+export function saveAuthSession(session, remember = false) {
+  clearAuthSession()
+  try {
+    const storage = remember ? window.localStorage : window.sessionStorage
+    storage.setItem(STORAGE_KEY, JSON.stringify(session))
+  } catch {
+    throw new Error('Your browser blocked session storage. Enable site storage and try again.')
+  }
+}
 
-// 4. Logout User
-export const logoutUser = async () => {
-    const response = await api.post('/api/auth/logout');
-    return response.data;
-};
+export function clearAuthSession() {
+  for (const key of ['localStorage', 'sessionStorage']) {
+    try { window[key].removeItem(STORAGE_KEY) } catch { /* Storage may be disabled. */ }
+  }
+}
+
+export async function authRequest(path, payload) {
+  let response
+  try {
+    response = await fetch(`${API_URL}/api/auth/${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+  } catch {
+    throw new Error('Unable to connect to the authentication service.')
+  }
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(data.detail || 'Authentication failed.')
+  return data
+}
+
+export async function authenticatedFetch(url, options = {}) {
+  const headers = new Headers(options.headers || {})
+  const token = getAccessToken()
+  if (token) headers.set('Authorization', `Bearer ${token}`)
+  const response = await fetch(url, { ...options, headers })
+  if (response.status === 401) window.dispatchEvent(new Event('auth:expired'))
+  return response
+}

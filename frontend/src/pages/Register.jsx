@@ -1,11 +1,16 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { User, Mail, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react'
+import {
+  User,
+  Mail,
+  ArrowRight,
+  AlertCircle
+} from 'lucide-react'
 
 import AuthLayout from '../components/auth/AuthLayout'
 import AuthInput from '../components/auth/AuthInput'
 import PasswordInput from '../components/auth/PasswordInput'
-import { registerUser } from '../services/authService'
+import { useAuth } from '../app/useAuth'
 
 function Register() {
   const navigate = useNavigate()
@@ -16,8 +21,9 @@ function Register() {
   })
 
   const [message, setMessage] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const { register } = useAuth()
+  const navigate = useNavigate()
 
   const handleChange = event => {
     const { name, value } = event.target
@@ -53,6 +59,26 @@ function Register() {
       )
     } finally {
       setLoading(false)
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setMessage('Passwords do not match.')
+      return
+    }
+
+    if (!formData.agree) {
+      setMessage('Please accept the Terms and Conditions.')
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      await register(formData.name.trim(), formData.email.trim(), formData.password)
+      navigate('/lectures', { replace: true })
+    } catch (error) {
+      setMessage(error.message || 'Unable to create your account.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -117,18 +143,18 @@ function Register() {
 
         {/* Success Alert */}
         {message && (
-          <div className="flex items-start gap-2 rounded-xl border border-indigo-500/20 bg-indigo-500/10 p-3 text-xs text-indigo-200 leading-5">
-            <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
+          <div role="alert" className="flex gap-2 items-start rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-200 leading-5">
+            <AlertCircle size={16} className="shrink-0 mt-0.5" />
             {message}
           </div>
         )}
 
         <button
           type="submit"
-          disabled={loading}
-          className="gradient-button w-full flex items-center justify-center gap-2 py-4 rounded-xl text-white font-bold text-sm disabled:opacity-50"
+          disabled={submitting}
+          className="gradient-button w-full flex items-center justify-center gap-2 py-4 rounded-xl text-white font-bold text-sm"
         >
-          {loading ? 'Creating account...' : 'Create Account'} <ArrowRight size={17} />
+          {submitting ? 'Creating account…' : 'Create account'} <ArrowRight size={17} />
         </button>
       </form>
     </AuthLayout>

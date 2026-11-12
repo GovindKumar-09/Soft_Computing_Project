@@ -18,7 +18,7 @@ function getLectureStatus(lecture) {
   const status = (lecture.status || '').toLowerCase()
 
   if (['processed', 'completed'].includes(status)) return 'completed'
-  if (status === 'failed') return 'failed'
+  if (status.includes('failed') || status === 'error') return 'failed'
 
   return 'processing'
 }

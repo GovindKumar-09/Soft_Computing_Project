@@ -73,7 +73,7 @@ function RecentLectures() {
 
         {/* LECTURE CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {demoLectures.map((lecture, index) => {
+          {demoLectures.map(lecture => {
             const Icon = lecture.icon
 
             return (

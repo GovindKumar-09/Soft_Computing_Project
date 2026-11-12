@@ -15,4 +15,8 @@ dist/
 
 .DS_Store
 *.log
->>>>>>> origin/my_frontend
+
+.venv/
+__pycache__/
+*.pyc
+.env
